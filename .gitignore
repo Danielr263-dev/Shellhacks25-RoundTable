@@ -1,0 +1,26 @@
+1. Virtual Environment
+The 'env' folder is what you created with 'python -m venv env'.
+This is crucial: NEVER commit the virtual environment.
+env/
+venv/
+*.pyc
+pycache/
+
+2. Dependencies
+Dependencies are installed via pip. We commit the requirements.txt, not the installed files.
+dist/
+build/
+*.egg-info/
+
+3. Django-Specific Files
+Database files, logs, and sensitive data (if not using environment variables)
+*.sqlite3
+db.sqlite3
+/media/
+/static_collected/
+.DS_Store
+
+4. Environment Variables (Sensitive Data)
+CRITICAL: Always ignore environment variable files that contain secrets (like DB passwords, API keys, etc.)
+.env
+.local.env
