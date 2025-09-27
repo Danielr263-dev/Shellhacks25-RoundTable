@@ -1,43 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoundTable</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
+        body {
+            /* * --- THIS IS THE NEW GRADIENT LOGIC ---
+             *
+             * We are now using a single, multi-stop linear gradient that stretches
+             * the entire height of the scrollable page.
+             *
+             * 1. `background-attachment: fixed;` has been REMOVED. The background now scrolls
+             * with the content.
+             * 2. The `linear-gradient` has four stops:
+             * - `var(--gold-color) 0%`: Starts solid gold at the very top.
+             * - `var(--black-color) 15%`: Fades to solid black by the 15% mark.
+             * - `var(--black-color) 85%`: Stays solid black until the 85% mark.
+             * - `var(--gold-color) 100%`: Fades back to solid gold at the very bottom.
+             * 3. The JavaScript for swapping backgrounds is no longer needed and has been removed.
+            */
+            --gold-color: #FFD700;
+            --black-color: #000000;
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+            background: linear-gradient(
+                to bottom, 
+                var(--gold-color) 0%, 
+                var(--black-color) 15%, 
+                var(--black-color) 85%, 
+                var(--gold-color) 100%
+            );
+            color: white;
+        }
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
-  </body>
+        /* The 'body.scrolled-to-bottom' rule has been removed */
+
+        /* The rest of the styles are unchanged */
+        .content-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particle-canvas"></canvas>
+
+    <main class="max-w-4xl mx-auto p-4 md:p-8 relative z-10">
+        <div class="content-card rounded-xl shadow-2xl p-8 md:p-12 text-center">
+            <h1 class="text-4xl md:text-6xl font-bold mb-4" style="color: var(--gold-color);">Welcome to RoundTable</h1>
+            <p class="text-xl md:text-2xl text-gray-300">Dynamic Messages Coming Soon</p>
+        </div>
+
+        <div class="mt-16 space-y-8 text-gray-300">
+           <!-- Dummy content -->
+            <p class="text-lg leading-relaxed">This version uses a single, static CSS gradient for the entire page background. There is no more JavaScript swapping the styles when you scroll.</p>
+            <p class="text-lg leading-relaxed">The effect is achieved by defining multiple "color stops" in the `linear-gradient` function. This allows us to have the gold at the top, fade to a long black section in the middle, and then fade back to gold at the very bottom of the page content.</p>
+            <p class="text-lg leading-relaxed">The floating particles remain fixed, creating a nice parallax effect as you scroll through the content.</p>
+            <p class="text-lg leading-relaxed">Keep scrolling... you're almost there!</p>
+            <p class="text-lg leading-relaxed">A little more...</p>
+            <p class="text-lg leading-relaxed">Just a bit further...</p>
+            <p class="text-lg font-bold text-center mt-8" style="color: var(--gold-color);">You've reached the end!</p>
+        </div>
+    </main>
+
+    <script>
+        // --- GRADIENT SCROLL LOGIC HAS BEEN REMOVED ---
+        
+        // --- AMBIENT PARTICLE LOGIC (Unchanged) ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particlesArray;
+
+        class Particle {
+            constructor(x, y, directionX, directionY, size, color) {
+                this.x = x; this.y = y; this.directionX = directionX; this.directionY = directionY; this.size = size; this.color = color;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+            update() {
+                if (this.x > canvas.width || this.x < 0) { this.directionX = -this.directionX; }
+                if (this.y > canvas.height || this.y < 0) { this.directionY = -this.directionY; }
+                this.x += this.directionX;
+                this.y += this.directionY;
+                this.draw();
+            }
+        }
+
+        function init() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 9000;
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let directionX = (Math.random() * .4) - .2;
+                let directionY = (Math.random() * .4) - .2;
+                let color = 'rgba(255, 245, 225, 0.2)';
+                particlesArray.push(new Particle(x, y, directionX, directionY, size, color));
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+        }
+        
+        window.addEventListener('resize', () => {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            init();
+        });
+
+        init();
+        animate();
+    </script>
+</body>
 </html>
